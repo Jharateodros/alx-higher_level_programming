@@ -1,41 +1,41 @@
 #!/usr/bin/python3
+"""Log parsing script."""
+import sys
 
-"""
-Module that reads stdin line by line and computes metrics
-"""
+total_size = 0
+codes = {'200': 0, '301': 0, '400': 0, '401': 0,
+         '403': 0, '404': 0, '405': 0, '500': 0}
+iteration = 0
 
-if __name__ == '__main__':
 
-    import sys
+def print_stats():
+    """Function that prints a resume of the stats."""
+    print("File size: {}".format(total_size))
+    for k, v in sorted(codes.items()):
+        if v is not 0:
+            print("{}: {}".format(k, v))
 
-    file_size = 0
-    possible_codes = ["200", "301", "400", "401", "403", "404", "405", "500"]
-    stats = {i: 0 for i in possible_codes}
-    counter = 0
 
-    def print_stats(stats: dict, file_size: int) -> None:
-        print("File size: {:d}".format(file_size))
-        for i, v in sorted(stats.items()):
-            if v:
-                print("{}: {}".format(i, v))
-
-    try:
-        for line in sys.stdin:
-            counter += 1
-            data = line.split()
+try:
+    for line in sys.stdin:
+        line = line.split()
+        if len(line) >= 2:
+            tmp = iteration
+            if line[-2] in codes:
+                codes[line[-2]] += 1
+                iteration += 1
             try:
-                status_code = data[-2]
-                if status_code in stats:
-                    stats[status_code] += 1
-            except BaseException:
-                pass
-            try:
-                file_size += int(data[-1])
-            except BaseException:
-                pass
-            if counter % 10 == 0:
-                print_stats(stats, file_size)
-        print_stats(stats, file_size)
-    except KeyboardInterrupt:
-        print_stats(stats, file_size)
-        raise
+                total_size += int(line[-1])
+                if tmp == iteration:
+                    iteration += 1
+            except:
+                if tmp == iteration:
+                    continue
+
+        if iteration % 10 == 0:
+            print_stats()
+
+    print_stats()
+
+except KeyboardInterrupt:
+    print_stats()
