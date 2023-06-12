@@ -1,11 +1,11 @@
 #!/usr/bin/node
+const { argv } = require('process');
 
-if (process.argv.length > 3) {
-	const array = process.argv.slice(2).map(Number);
-
-
-	array.splice(array.indexOf(Math.max.apply(null, array)), 1);
-	console.log(Math.max.apply(null, array));
+if (argv.length <= 3) {
+  console.log(0);
 } else {
-	console.log(0);
+  let newArgv = argv.slice(2, argv.length);
+  newArgv = newArgv.map((value) => parseInt(value));
+  newArgv.sort((a, b) => b - a);
+  console.log(newArgv[1]);
 }
